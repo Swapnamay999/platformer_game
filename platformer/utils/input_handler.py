@@ -19,9 +19,13 @@ def handle_player_input(player):
     # Move right with D or RIGHT arrow
     if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
         player.move_right()
-        
-    # Jump with SPACE, UP or W
-    if keys[pygame.K_SPACE] or keys[pygame.K_UP] or keys[pygame.K_w]:
-        player.jump()
+    
+    # Handle one-time key presses (like jumping)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            return False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE or event.key == pygame.K_UP or event.key == pygame.K_w:
+                player.jump()
     
     return True

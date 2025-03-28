@@ -22,12 +22,6 @@ class PlatformerGame:
     def run(self):
         running = True
         while running:
-            # Handle events
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.QUIT:
-                    running = False
-            
             # Update input and player
             if not handle_player_input(self.player):
                 running = False

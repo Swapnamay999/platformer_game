@@ -15,14 +15,22 @@ class Player:
         # Movement attributes
         self.velocity_x = 0
         self.velocity_y = 0
-        self.speed = 5
+        self.speed = 8
         self.jump_power = 15
-        self.gravity = 1
+        self.gravity = 0.8
         self.on_ground = False
+        self.acceleration = 0.5
+        self.deceleration = 0.3
     
     def update(self, platforms, screen_width, screen_height):
         # Apply gravity
         self.velocity_y += self.gravity
+        
+        # Apply horizontal acceleration/deceleration
+        if self.velocity_x > 0:
+            self.velocity_x = max(0, self.velocity_x - self.deceleration)
+        elif self.velocity_x < 0:
+            self.velocity_x = min(0, self.velocity_x + self.deceleration)
         
         # Update horizontal position
         self.rect.x += self.velocity_x
@@ -72,10 +80,10 @@ class Player:
             self.velocity_y = -self.jump_power
     
     def move_left(self):
-        self.velocity_x = -self.speed
+        self.velocity_x = max(-self.speed, self.velocity_x - self.acceleration)
     
     def move_right(self):
-        self.velocity_x = self.speed
+        self.velocity_x = min(self.speed, self.velocity_x + self.acceleration)
     
     def stop(self):
         self.velocity_x = 0
