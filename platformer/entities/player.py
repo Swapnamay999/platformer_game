@@ -23,7 +23,7 @@ class Player:
         self.gravity = 0.8
         self.on_ground = False
         self.acceleration = 0.8  # Increased for more responsive movement
-        self.deceleration = 0.6  # Adjusted for smoother deceleration
+        self.deceleration = 0.5  # Adjusted for smoother deceleration
         self.min_velocity = 0.1  # Minimum velocity threshold
 
     def update(self, platforms, screen_width, screen_height):
@@ -43,12 +43,13 @@ class Player:
         # Update horizontal position
         self.rect.x += self.velocity_x
 
-        # Check screen boundaries
-        if self.rect.left < 0:
-            self.rect.left = 0
+        # Check screen boundaries - allow movement up to 50% of screen width
+        screen_center = screen_width // 2
+        if self.rect.left < screen_center - screen_width // 2:
+            self.rect.left = screen_center - screen_width // 2
             self.velocity_x = 0
-        elif self.rect.right > screen_width:
-            self.rect.right = screen_width
+        elif self.rect.right > screen_center + screen_width // 2:
+            self.rect.right = screen_center + screen_width // 2
             self.velocity_x = 0
 
         # Check horizontal collisions

@@ -3,6 +3,7 @@ from enum import Enum
 import pygame
 
 from .platform import Platform
+from game.camera import Camera
 
 
 class Color(Enum):
@@ -20,72 +21,45 @@ class Level:
         self.platforms = []
         self.player_spawn_x = 50  # Starting near the left
         self.player_spawn_y = screen_height - 20  # A bit above the ground
+        self.level_width = screen_width * 3  # Make level 3x wider than screen
+        self.camera = Camera(screen_width, screen_height, self.level_width)
 
         # Generate the level
         self._generate_level()
 
     def _generate_level(self):
-        # Ground
+        # Ground - extend across the entire level width
         ground_height = 20
         self.platforms.append(
             Platform(
                 0,
                 self.screen_height - ground_height,
-                self.screen_width,
+                self.level_width,
                 ground_height,
                 (50, 50, 50),
             )
         )
 
-        # Platform patterns
-        # First section - Basic jumps
-        self.platforms.extend(
-            [
-                Platform(200, self.screen_height - 120, 100, 20),  # First jump
-                Platform(400, self.screen_height - 180, 100, 20),  # Higher platform
-                Platform(600, self.screen_height - 120, 100, 20),  # Back down
-            ]
-        )
+        # Platform patterns - repeat 3 times
+        for i in range(3):
+            base_x = i * self.screen_width
+            self.platforms.extend([
+                Platform(base_x + 200, self.screen_height - 120, 100, 20, Color.RED.value),  # First jump
+                Platform(base_x + 400, self.screen_height - 180, 100, 20, Color.GREEN.value),  # Higher platform
+                Platform(base_x + 600, self.screen_height - 120, 100, 20, Color.BLUE.value),  # Back down
+            ])
 
-        # Second section - Vertical challenge
-        self.platforms.extend(
-            [
-                Platform(150, self.screen_height - 250, 80, 20),
-                Platform(300, self.screen_height - 320, 80, 20),
-                Platform(150, self.screen_height - 390, 80, 20),  # Top platform
-            ]
-        )
-
-        # Third section - Gap jumps
-        self.platforms.extend(
-            [
-                Platform(400, self.screen_height - 200, 60, 20),
-                Platform(550, self.screen_height - 200, 60, 20),
-                Platform(700, self.screen_height - 200, 60, 20),
-            ]
-        )
-
-        # Some floating platforms for exploration
-        self.platforms.extend(
-            [
-                Platform(300, self.screen_height - 400, 40, 20, (150, 150, 150)),
-                Platform(500, self.screen_height - 350, 40, 20, (150, 150, 150)),
-                Platform(650, self.screen_height - 450, 40, 20, (150, 150, 150)),
-            ]
-        )
-
-        # Add some walls/vertical platforms
-        self.platforms.extend(
-            [
-                Platform(
-                    100, self.screen_height - 120, 20, 100, Color.RED.value
-                ),  # Left wall
-                Platform(
-                    700, self.screen_height - 300, 20, 280, Color.GREEN.value
-                ),  # Right wall
-            ]
-        )
-
+    def update_camera(self, player_x):
+        self.camera.update(player_x)
+        
     def draw(self, surface):
+        # Create a temporary surface for the entire level
+        level_surface = pygame.Surface((self.level_width, self.screen_height))
+        level_surface.fill((0, 0, 0))  # Black background
+        
+        # Draw all platforms
         for platform in self.platforms:
-            platform.draw(surface)
+            platform.draw(level_surface)
+            
+        # Draw the visible portion of the level using camera
+        self.camera.draw(surface, level_surface)

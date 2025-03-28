@@ -31,7 +31,10 @@ class PlatformerGame:
             if not handle_player_input(self.player):
                 running = False
 
-            self.player.update(self.current_level.platforms, 800, 600)
+            self.player.update(self.current_level.platforms, self.current_level.level_width, 600)
+            
+            # Update camera position
+            self.current_level.update_camera(self.player.rect.x)
 
             # Draw
             self.screen.fill((0, 0, 0))
